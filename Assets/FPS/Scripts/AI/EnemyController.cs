@@ -372,6 +372,10 @@ namespace Unity.FPS.AI
                 Instantiate(LootPrefab, transform.position, Quaternion.identity);
             }
 
+            // 몬스터가 죽을때 100원증가
+            CurrencyManager.Instance.Add(ECurrencyType.Gold, 100);
+            Debug.Log("100추가 적이 죽음");
+
             // this will call the OnDestroy function
             Destroy(gameObject, DeathDuration);
         }
