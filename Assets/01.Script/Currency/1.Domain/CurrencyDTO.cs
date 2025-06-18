@@ -1,20 +1,25 @@
-using JetBrains.Annotations;
 using UnityEngine;
 
+// ê³„ì¸µ ê°„ ë°ì´í„° ì „ì†¡ì„ ìœ„í•´ ë„ë©”ì¸ ëª¨ë¸ ëŒ€ì‹  ì‚¬ìš©ë˜ëŠ” ê°ì²´ì´ë‹¤. 
 public class CurrencyDTO
 {
-    //º¯¼ö
     public readonly ECurrencyType Type;
     public readonly int Value;
-
-    //»ý¼ºÀÚ
+    
+    
     public CurrencyDTO(Currency currency)
     {
         Type = currency.Type;
         Value = currency.Value;
     }
 
-    //³ÑÄ¡´ÂÁö È®ÀÎ ¸Þ¼­µå bool
+    public CurrencyDTO(ECurrencyType type, int value)
+    {
+        Type = type;
+        Value = value;
+    }
+    
+
     public bool HaveEnough(int value)
     {
         return Value >= value;

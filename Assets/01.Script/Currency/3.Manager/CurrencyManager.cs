@@ -1,27 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Android.Gradle;
 using UnityEngine;
-    
-// ¾ÆÅ°ÅØÃ³: ¼³°è ±× ÀâÃ¤(¼³°è¸¶´Ù Ã¶ÇĞÀÌ ÀÖ´Ù.)
-// µğÀÚÀÎ ÆĞÅÏ: ¼³°è¸¦ ±¸ÇöÇÏ´Â °úÁ¤¿¡¼­ ¾²ÀÌ´Â ÆĞÅÏ
+
+// ì•„í‚¤í…ì²˜: ì„¤ê³„ ê·¸ ì¡ì±„(ì„¤ê³„ë§ˆë‹¤ ì² í•™ì´ ìˆë‹¤.)
+// ë””ìì¸ íŒ¨í„´: ì„¤ê³„ë¥¼ êµ¬í˜„í•˜ëŠ” ê³¼ì •ì—ì„œ ì“°ì´ëŠ” íŒ¨í„´
 
 public class CurrencyManager : MonoBehaviour
 {
     public static CurrencyManager Instance;
 
     private Dictionary<ECurrencyType, Currency> _currencies;
+    
+    // ë„ë©”ì¸ì— ë³€í™”ê°€ ìˆì„ ë•Œ í˜¸ì¶œë˜ëŠ” ì•¡ì…˜
+    public event Action OnDataChanged;
 
-    public CurrencyRepository _repository;
-
-    public Action OnDataChanged;
-
-    // ¸¶Æ¾ ¾ÆÀú¾¾: ¹Ì¸®ÇÏ´Â ¼º´É ÃÖÀûÈ­ÀÇ 90%´Â ÀÇ¹Ì°¡ ¾ø´Ù.
+    private CurrencyRepository _repository;
+    
+    // ë§ˆí‹´ ì•„ì €ì”¨: ë¯¸ë¦¬í•˜ëŠ” ì„±ëŠ¥ ìµœì í™”ì˜ 90%ëŠ” ì˜ë¯¸ê°€ ì—†ë‹¤.
     // public event Action OnGoldChanged;
     // public event Action OnDiamondChanged;
-
-
+    
     private void Awake()
     {
         if (Instance == null)
@@ -37,28 +36,25 @@ public class CurrencyManager : MonoBehaviour
         Init();
     }
 
-
-    //ÃÊ±âÈ­
-    public void Init()
+    private void Init()
     {
-        _currencies = new Dictionary<ECurrencyType, Currency>();
+        // ìƒì„±
+        _currencies = new Dictionary<ECurrencyType, Currency>((int)ECurrencyType.Count);
+
+        // ë ˆí¬ì§€í† ë¦¬(ê¹ƒí—ˆë¸Œ)
         _repository = new CurrencyRepository();
 
-        List<CurrencyDTO> loadedCurrencies = _repository.Load();
-        if(loadedCurrencies == null)
-        for(int i = 0; i < (int)ECurrencyType.Count; i++)
+        // ì´í›„ ì—´ê±°í˜•ì´ ì¶”ê°€ë˜ë”ë¼ë„ ì•Œì•„ì„œ ì˜ ì‚½ì…ë˜ê²Œ ë³€ê²½ ì™„ë£Œ
+        List<CurrencyDTO> loadedCurrencies = _repository.Load(AccountManager.Instance.CurrentAccount.Email);
+        for (int i = 0; i < (int)ECurrencyType.Count; ++i)
         {
             ECurrencyType type = (ECurrencyType)i;
-            Currency currency = new Currency(type, 0);
+            CurrencyDTO loadedCurrency = loadedCurrencies?.Find(data => data.Type == type);
+
+            // ì €ì¥ëœ ë°ì´í„°ê°€ ìˆë‹¤ë©´ ê·¸ ê°’.. ì—†ë‹¤ë©´ 0
+            Currency currency = new Currency(type, loadedCurrency != null ? loadedCurrency.Value : 0);
+            
             _currencies.Add(type, currency);
-        }
-        else
-        {
-            foreach (var data in loadedCurrencies)
-            {
-                Currency currency = new Currency(data.Type, data.Value);
-                _currencies.Add(currency.Type, currency);
-            }
         }
     }
 
@@ -69,35 +65,35 @@ public class CurrencyManager : MonoBehaviour
 
     public CurrencyDTO Get(ECurrencyType type)
     {
-        return new CurrencyDTO (_currencies[type]);
+        return new CurrencyDTO(_currencies[type]);
     }
 
-    //´õÇÏ±â
     public void Add(ECurrencyType type, int value)
     {
         _currencies[type].Add(value);
+        
+        // ë‹¤ì–‘í•œ ì´ìœ ë¡œ ì—¬ê¸°ì— ê·œì¹™ì´ ë“¤ì–´ê°€ê¸°ë„í•œë‹¤.
 
-        //save
-
-        _repository.Save(ToDtoList());
-        //Äİ¹é
-
+        _repository.Save(ToDtoList(), AccountManager.Instance.CurrentAccount.Email);
+        
+        AchievementManager.Instance.Increase(EAchievementCondition.GoldCollect, value);
+        
         OnDataChanged?.Invoke();
     }
-
-
-    //»ç±â
-
-    public bool TryBuy(ECurrencyType Type, int value)
+    
+    
+    public bool TryBuy(ECurrencyType type, int value)
     {
-        if (!_currencies[Type].TryBuy(value))
+        if (!_currencies[type].TryBuy(value))
         {
             return false;
         }
+        
+        _repository.Save(ToDtoList(), AccountManager.Instance.CurrentAccount.Email);
 
-        _repository.Save(ToDtoList());
-        //Äİ¹é
         OnDataChanged?.Invoke();
+
         return true;
     }
+    
 }

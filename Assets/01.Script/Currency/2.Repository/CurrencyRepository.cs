@@ -1,40 +1,52 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CurrencyRepository
 {
-    // Repository: µ¥ÀÌÅÍÀÇ ¿µ¼Ó¼º º¸Àå
-    // ¿µ¼Ó¼º: ÇÁ·Î±×·¥À» Á¾·áÇØµµ µ¥ÀÌÅÍ°¡ º¸Á¸µÇ´Â °Í
-
+    // Repository: ë°ì´í„°ì˜ ì˜ì†ì„± ë³´ì¥
+    // ì˜ì†ì„±: í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•´ë„ ë°ì´í„°ê°€ ë³´ì¡´ë˜ëŠ” ê²ƒ
+    
     private const string SAVE_KEY = nameof(CurrencyRepository);
-
-    //Save
-    public void Save(List<CurrencyDTO> dataList)
+    
+    // Save
+    public void Save(List<CurrencyDTO> dataList, string id)
     {
-        CurrencySaveData data = new CurrencySaveData();
-        data.DataList = dataList;
-        string json = JsonUtility.ToJson(data);
-        PlayerPrefs.SetString(SAVE_KEY, json);
+        CurrencySaveDatas datas = new CurrencySaveDatas();
+        datas.DataList = dataList.ConvertAll(data => new CurrencySaveData
+        {
+            Type = data.Type,
+            Value = data.Value
+        });           
 
+        string json = JsonUtility.ToJson(datas);
+        PlayerPrefs.SetString(SAVE_KEY + "_" + id, json);
     }
-
-    public List<CurrencyDTO> Load()
+   
+    // Load
+    public List<CurrencyDTO> Load(string id)
     {
-        if (!PlayerPrefs.HasKey(SAVE_KEY))
+        if (!PlayerPrefs.HasKey(SAVE_KEY + "_" + id))
         {
             return null;
         }
-        
-        string json = PlayerPrefs.GetString(SAVE_KEY);
-        CurrencySaveData data =  JsonUtility.FromJson<CurrencySaveData>(json);
 
-        return data.DataList;
+        string json = PlayerPrefs.GetString(SAVE_KEY + "_" + id);
+        CurrencySaveDatas datas = JsonUtility.FromJson<CurrencySaveDatas>(json);
+
+        return datas.DataList.ConvertAll<CurrencyDTO>(data => new CurrencyDTO(data.Type, data.Value));
     }
 }
 
-
-//¸®½ºÆ®¸¦ Å¬·¡½ºÈ­ ÇØ¼­ ÀúÀåÇÏ±â À§ÇØ Àá±ñ ¾²ÀÎ´Ù.
-public class CurrencySaveData
+[Serializable]
+public struct CurrencySaveData
 {
-    public List<CurrencyDTO> DataList;
+    public ECurrencyType Type;
+    public int Value;
+}
+
+[Serializable]
+public class CurrencySaveDatas
+{
+    public List<CurrencySaveData> DataList;
 }

@@ -1,57 +1,70 @@
+using System;
 using UnityEngine;
-    public enum ECurrencyType
-    {
-        Gold,
-        Diamonde,
 
-        Count,
-    }
-
-public class Currency 
+public enum ECurrencyType
 {
-    // µµ¸ŞÀÎ Å¬·¡½ºÀÇ ÀåÁ¡:
-    // 1. Ç¥Çö·ÂÀÌ Áõ°¡ÇÑ´Ù.
-    // -> È­ÆóÀÇ Á¾·ù¿Í °ª ¸ğµÎ Ç¥ÇöÇÒ ¼ö ÀÖ´Ù.
-    // 2. ¹«°á¼ºÀÌ À¯ÁöµÈ´Ù. (¹«°á¼º: µ¥ÀÌÅÍÀÇ Á¤È®¼º/ÀÏ°ü¼º/À¯È¿¼º)
-    // -> ÃÖÁ¾ °ªÀÌ: 0 ¹Ì¸¸ ±İÁö, À½¼ö¿Í ¿¹»ê ±İÁö
-    // 3. µ¥ÀÌÅÍ¿Í µ¥ÀÌÅÍ¸¦ ´Ù·ç´Â ·ÎÁ÷ÀÌ ¹¶ÃÄÀÖ´Ù. -> ÀÀÁıµµ°¡ ³ô´Ù.
+   Gold,
+   Diamond,
+   Ruby,
+   
+   Count
+}
 
-    // ÀÚ±â ¼­¼úÀûÀÎ ÄÚµå°¡ µÈ´Ù. (±âÈ¹¼­¿¡ ÀÇ°ÅÇÑ ÄÚµå°¡ µÈ´Ù.)
-    // µµ¸ŞÀÎ(±âÈ¹¼­) º¯°æÀÌ ÀÏ¾î³ª¸é ÄÚµå¿¡ ¹İ¿µÇÏ±â ½±´Ù. 
+public class Currency
+{
+   // ë„ë©”ì¸ í´ë˜ìŠ¤ì˜ ì¥ì :
+   // 1. í‘œí˜„ë ¥ì´ ì¦ê°€í•œë‹¤.
+   // -> í™”íì˜ ì¢…ë¥˜ì™€ ê°’ ëª¨ë‘ í‘œí˜„í•  ìˆ˜ ìˆë‹¤.
+   // 2. ë¬´ê²°ì„±ì´ ìœ ì§€ëœë‹¤. (ë¬´ê²°ì„±: ë°ì´í„°ì˜ ì •í™•ì„±/ì¼ê´€ì„±/ìœ íš¨ì„±)
+   // -> ìµœì¢… ê°’ì´: 0 ë¯¸ë§Œ ê¸ˆì§€, ìŒìˆ˜ì™€ ì˜ˆì‚° ê¸ˆì§€
+   // 3. ë°ì´í„°ì™€ ë°ì´í„°ë¥¼ ë‹¤ë£¨ëŠ” ë¡œì§ì´ ë­‰ì³ìˆë‹¤. -> ì‘ì§‘ë„ê°€ ë†’ë‹¤.
+   
+   // ìê¸° ì„œìˆ ì ì¸ ì½”ë“œê°€ ëœë‹¤. (ê¸°íšì„œì— ì˜ê±°í•œ ì½”ë“œê°€ ëœë‹¤.)
+   // ë„ë©”ì¸(ê¸°íšì„œ) ë³€ê²½ì´ ì¼ì–´ë‚˜ë©´ ì½”ë“œì— ë°˜ì˜í•˜ê¸° ì‰½ë‹¤. 
+   
+   // í™”í 'ë„ë©”ì¸' (ì½˜í…ì¸ , ì§€ì‹, ë¬¸ì œ, ê¸°íšì„œë¥¼ ë°”íƒ•ìœ¼ë¡œ ì‘ì„±í•œë‹¤: ê¸°íšìë‘ ë§ì´ í†µí•´ì•¼ í•œë‹¤.)
+   private ECurrencyType _type;
+   public ECurrencyType Type => _type;
+   
+   private int _value = 0;
+   public int Value => _value;
+   
+   // ë„ë©”ì¸ì€ 'ê·œì¹™'ì´ ìˆë‹¤.
+   public Currency(ECurrencyType type, int value)
+   {
+      if (value < 0)
+      {
+         throw new Exception("valueëŠ” 0ë³´ë‹¤ ì‘ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+      }
+      
+      _type = type;
+      _value = value;
+   }
 
-    // È­Æó 'µµ¸ŞÀÎ' (ÄÜÅÙÃ÷, Áö½Ä, ¹®Á¦, ±âÈ¹¼­¸¦ ¹ÙÅÁÀ¸·Î ÀÛ¼ºÇÑ´Ù: ±âÈ¹ÀÚ¶û ¸»ÀÌ ÅëÇØ¾ß ÇÑ´Ù.)
+   public void Add(int addedValue)
+   {
+      if (addedValue < 0)
+      {
+         throw new Exception("ì¶”ê°€ ê°’ì€ ìŒìˆ˜ê°€ ë  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+      }
 
-    private ECurrencyType _type;
-    public ECurrencyType Type => _type;
+      _value += addedValue;
+   }
 
-    private int _value;
-    public int Value => _value;
+   public bool TryBuy(int value)
+   {
+      if (value < 0)
+      {
+         throw new Exception("ì°¨ê° ê°’ì€ ìŒìˆ˜ê°€ ë  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+      }
 
+      if (_value < value)
+      {
+         return false;
+      }
+      
+      _value -= value; // ìƒ€ë‹¤
 
-    //»ı¼ºÀÚ
-
-    public Currency(ECurrencyType type, int value)
-    {
-        _type = type;
-        _value = value;
-    }
-
-    //´õÇÏ±â Add
-
-    public void Add( int addedValue)
-    {
-        _value += addedValue;
-    }
-
-    //°¡Á®¿À±â ½Ãµµ TryGet();
-    public bool TryBuy(int value)
-    {
-        if(_value < value)
-        {
-            return false; //¸ø»ò¾î
-        }
-
-        _value -= value; //»ò´Ù
-        return true;     //¼º°ø
-    }
+      return true;     // ìƒ€ë‹¤ ì„±ê³µ
+   }
 }

@@ -1,32 +1,36 @@
-
 using TMPro;
 using Unity.FPS.Game;
 using Unity.FPS.Gameplay;
+using Unity.FPS.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UI_Currency : MonoBehaviour
 {
     public TextMeshProUGUI GoldCountText;
     public TextMeshProUGUI DiamondCountText;
     public TextMeshProUGUI BuyHealthText;
-
-    //ÃÊ±âÈ­
-
+    
     private void Start()
     {
         Refresh();
+
         CurrencyManager.Instance.OnDataChanged += Refresh;
     }
-
-    void Refresh()
+    
+    private void Refresh()
     {
-        GoldCountText.text = $"{CurrencyManager.Instance.Get(ECurrencyType.Gold).Value}";
-        DiamondCountText.text = $"{CurrencyManager.Instance.Get(ECurrencyType.Diamonde).Value}";
-        BuyHealthText.text = "";
+        var gold = CurrencyManager.Instance.Get(ECurrencyType.Gold);
+        var diamond = CurrencyManager.Instance.Get(ECurrencyType.Diamond);
+        
+        GoldCountText.text    = $"Gold: {gold.Value}";
+        DiamondCountText.text = $"Diamond: {diamond.Value}";
+        
+      
+        BuyHealthText.color = gold.HaveEnough(300) ? Color.green : Color.red;
     }
 
-    //3¹ø±â ´©¸£¸é ÇÇ¸ÔÀ½
-
+    // Bad Smell Code
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -35,26 +39,27 @@ public class UI_Currency : MonoBehaviour
         }
     }
 
-    //ÇÇ ±¸ÀÔÇØ¼­ ¸ÔÀ½
+    
+    
     public void BuyHealth()
     {
-        Debug.Log("¹öÆ°");
+        Debug.Log("ë²„íŠ¼");
 
-
-        if (CurrencyManager.Instance.TryBuy(ECurrencyType.Gold, 300))
+        
+        if (CurrencyManager.Instance.TryBuy(ECurrencyType.Gold,300))
         {
             var player = GameObject.FindFirstObjectByType<PlayerCharacterController>();
             Health playerHealth = player.GetComponent<Health>();
             playerHealth.Heal(100);
-
-            // ¼º°ø ÆÄÆ¼Å¬ ¶ç¿î´Ù´øÁö
+            
+            // ì„±ê³µ íŒŒí‹°í´ ë„ìš´ë‹¤ë˜ì§€
         }
         else
         {
-            // ¾Ë¸²À» ¶ç¿î´Ù.
-            // Åä½ºÆ® ¸Ş½ÃÁö¸£ ¶ç¿î´Ù´øÁö..
+            // ì•Œë¦¼ì„ ë„ìš´ë‹¤.
+            // í† ìŠ¤íŠ¸ ë©”ì‹œì§€ë¥´ ë„ìš´ë‹¤ë˜ì§€..
         }
-
-
+        
+      
     }
 }
