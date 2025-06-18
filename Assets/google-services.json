@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "969664389225",
+    "project_id": "hellowfirebase-74add",
+    "storage_bucket": "hellowfirebase-74add.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969664389225:android:8c05b3c650b21fe94e02f8",
+        "android_client_info": {
+          "package_name": "com.skku.ingame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO_aJEwtXjUoHiQe7zavUMmWvQJdm7fgE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
